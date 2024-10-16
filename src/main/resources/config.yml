@@ -11,4 +11,4 @@
 port: 25599
 
 # clients without this code will be unable to connect
-auth-code: 'connectPassword'
+auth-code: 'P@ssword'

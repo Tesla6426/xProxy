@@ -17,11 +17,51 @@ public class ClientHandler implements Runnable{
             this.socket = socket;
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter( socket.getOutputStream()));
             this.bufferedReader = new BufferedReader( new InputStreamReader( socket.getInputStream()));
-            this.clientName = bufferedReader.readLine();
-            clientHandlers.add(this);
+            String con = bufferedReader.readLine();
 
-            // get name of server
-            broadcast("Server " + clientName + " has connected");
+            String passwordAttempt = "attempt", packetType = "null";
+            // try/catch so you cant crash the server without knowing the password
+            try {
+                // get connection packet data
+                // copy paste anywhere you need to decode a packet :)
+                passwordAttempt = con.substring(con.lastIndexOf("¦")+1, con.length());
+                this.clientName = con.substring(0, con.indexOf("¦"));
+                packetType = con.substring(con.indexOf("¦")+1, con.lastIndexOf("¦"));
+
+                // debug, remove later
+                System.out.println("passwordAttempt = " + passwordAttempt);
+                System.out.println("unverifiedName = " + clientName);
+                System.out.println("connectionPacket = " + packetType);
+
+            }catch (Exception e) {
+                // refuse connection
+                System.out.println("Unknown client failed to connect: Invalid Packet");
+                closeCurrentSocket(socket, bufferedReader, bufferedWriter);
+                return;
+            }
+
+            System.out.println(clientName + " is connecting");
+
+            // make sure first packet is a connection packet
+            if (packetType.equals("con")) {
+                // disconnect if password is NOT correct
+                if (!passwordAttempt.equals(Server.password)) {
+                    // refuse connection
+                    System.out.println("Incorrect Password : refusing connection for " + clientName);
+                    closeCurrentSocket(socket, bufferedReader, bufferedWriter);
+                    return;
+                }
+                // verify client when both checks pass
+                clientHandlers.add(this);
+            }else {
+                // refuse connection
+                System.out.println("Malformed/Invalid connection packet : refusing connection for " + clientName);
+                closeCurrentSocket(socket, bufferedReader, bufferedWriter);
+                return;
+            }
+
+            broadcast(clientName + " has connected");
+
 
 
         } catch (Exception e) {
@@ -73,7 +113,7 @@ public class ClientHandler implements Runnable{
     public void removeClientHandler() {
         // Remove client from list
         clientHandlers.remove(this);
-        broadcast("SERVER " + clientName + " has disconnected");
+        broadcast(clientName + " has disconnected");
     }
     public void closeCurrentSocket(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
         removeClientHandler();

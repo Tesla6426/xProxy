@@ -6,6 +6,7 @@ import java.net.Socket;
 
 public class Server {
     private ServerSocket serverSocket;
+    static String password;
 
     public Server(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
