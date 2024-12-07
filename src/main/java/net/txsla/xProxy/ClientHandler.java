@@ -80,11 +80,8 @@ public class ClientHandler implements Runnable{
                 String command = recieved.substring(recieved.indexOf(sep)+1, recieved.lastIndexOf(sep));
                 String data = recieved.substring(recieved.lastIndexOf(sep)+1, recieved.length());
 
-                System.out.println("\nincomingName : " + name);
-                System.out.println("incomingCommand : " + command );
-                System.out.println("incomingData : " + data+ "\n");
-
                 broadcast(recieved);
+
             }catch (Exception e) {
                 closeCurrentSocket(socket, bufferedReader, bufferedWriter);
                 break;
