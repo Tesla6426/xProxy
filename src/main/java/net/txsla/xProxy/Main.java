@@ -1,8 +1,5 @@
 package net.txsla.xProxy;
 
-import net.txsla.xProxy.Server;
-
-import java.io.IOException;
 import java.net.ServerSocket;
 
 public class Main {
