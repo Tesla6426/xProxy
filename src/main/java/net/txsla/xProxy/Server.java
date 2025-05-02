@@ -6,12 +6,12 @@ import java.net.Socket;
 
 public class Server {
     private ServerSocket serverSocket;
-    static String password;
-
     public Server(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
     }
     public void startServer() {
+        // load password
+
         try {
             System.out.println("xProxy Started!");
             System.out.println("waiting for connections");

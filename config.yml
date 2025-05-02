@@ -11,7 +11,7 @@
 port: 25599
 
 # clients without this code will be unable to connect
-auth-code: 'P@ssword'
+auth-code: P@ssword
 
 # display all packets to console
 show-packets: true

@@ -1,0 +1,34 @@
+# do not touch this value
+file-version: 1
+
+# This file is for ProxyChat's built-in ranks system
+# The ranks are PURELY VISUAL and do not grant any special permissions
+# The ProxyChat ranks system is only enabled when 'rank-system:' is set to "ProxyChat" in the main config
+xProxyRanks:
+  # list all the enabled ranks you have added here
+  ranks-list:
+  - admin
+  - moderator
+  ranks-config:
+    # default rank is for all non-ranked players, do NOT delete this or add it to the rank list
+    default:
+      prefix: <grey>[MEMBER]
+      permissions:
+      - minecraft.command.time
+    admin:
+      prefix: <dark_red>[ADMIN xproxy]
+      permissions:
+      - minecraft.command.op
+      - minecraft.command.deop
+      players:
+      - _txsla
+      - nbtArchives
+      - your-ign
+    moderator:
+      prefix: <red>[Moderator]
+      players:
+      - mod1
+      - mod2
+      permissions:
+      - minecraft.command.ban
+      - minecraft.command.kick

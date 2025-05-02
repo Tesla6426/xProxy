@@ -28,10 +28,11 @@ public class ClientHandler implements Runnable{
                 this.clientName = con.substring(0, con.indexOf("¦"));
                 packetType = con.substring(con.indexOf("¦")+1, con.lastIndexOf("¦"));
 
-                // debug, remove later
-                System.out.println("passwordAttempt = " + passwordAttempt);
-                System.out.println("unverifiedName = " + clientName);
-                System.out.println("connectionPacket = " + packetType);
+                if (config.debug) {
+                    System.out.println("passwordAttempt = " + passwordAttempt);
+                    System.out.println("unverifiedName = " + clientName);
+                    System.out.println("connectionPacket = " + packetType);
+                }
 
             }catch (Exception e) {
                 // refuse connection
@@ -45,7 +46,7 @@ public class ClientHandler implements Runnable{
             // make sure first packet is a connection packet
             if (packetType.equals("con")) {
                 // disconnect if password is NOT correct
-                if (!passwordAttempt.equals(Server.password)) {
+                if (!passwordAttempt.equals(config.password)) {
                     // refuse connection
                     System.out.println("Incorrect Password : refusing connection for " + clientName);
                     closeCurrentSocket(socket, bufferedReader, bufferedWriter);
@@ -75,12 +76,30 @@ public class ClientHandler implements Runnable{
             try {
                 recieved = bufferedReader.readLine();
 
-                // process incoming packet
-                String name = recieved.substring(0, recieved.indexOf(sep) );
-                String command = recieved.substring(recieved.indexOf(sep)+1, recieved.lastIndexOf(sep));
-                String data = recieved.substring(recieved.lastIndexOf(sep)+1, recieved.length());
+                if (config.show_packets) System.out.println("Received Packet: " + recieved);
 
-                broadcast(recieved);
+                // process incoming packet
+                String name = recieved.split("¦")[0];
+                String command = recieved.split("¦")[1];
+                String data = recieved.split("¦")[2];
+                String whoFor = data.split("-")[0];
+
+                switch (command) {
+                  case "bdc":
+                  // broadcast packet
+                  // used to send messages to all connected servers
+                    broadcast(recieved);
+                    break;
+                  case "req":
+                     // request packet
+                    RequestHandler.handle(name, data, recieved);
+                    break;
+                  default:
+                    if (config.debug || config.show_packets) System.out.println("Error processing packet from " + name);
+                    if (config.debug) System.out.println("received: " + recieved + "\nname: " + name + "\ncommand: " + command + "\ndata: " + data + "\n");
+                }
+
+
 
             }catch (Exception e) {
                 closeCurrentSocket(socket, bufferedReader, bufferedWriter);
@@ -90,7 +109,7 @@ public class ClientHandler implements Runnable{
     }
     public void broadcast(String sendData) {
         // send message to console
-        System.out.println(sendData);
+        if (config.debug || config.show_packets) System.out.println(sendData);
 
         // cycle through all connected xProxy clients
         for (ClientHandler clientHandler : clientHandlers) {
@@ -103,6 +122,7 @@ public class ClientHandler implements Runnable{
                     clientHandler.bufferedWriter.flush();
                 }
             }catch (Exception e) {
+                if (config.debug) System.out.println("Error processing data: " + e);
                 closeCurrentSocket(socket, bufferedReader, bufferedWriter);
             }
         }
@@ -120,7 +140,7 @@ public class ClientHandler implements Runnable{
             if (bufferedWriter != null ) bufferedWriter.close();
             if (socket != null) socket.close();
         } catch (Exception e){
-            e.printStackTrace();
+            if (config.debug) System.out.println("Error closing socket: " + e);
         }
     }
 }
